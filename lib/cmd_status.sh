@@ -68,16 +68,15 @@ cmd_doctor() {
     echo "OK:   registry found"
 
     _py=$(require_python)
-    _dup=$("$_py" "$LOVE_ROOT/cli/registry_query.py" check-duplicate-tags "$_reg" 2>/dev/null || true)
-    if [ -n "$_dup" ]; then
-        echo "FAIL: duplicate tags found:" >&2
-        echo "$_dup" >&2
+    _repo=$("$_py" "$LOVE_ROOT/cli/registry_query.py" repository "$_reg" 2>/dev/null || echo "")
+    if [ -z "$_repo" ]; then
+        echo "FAIL: registry has no repository URL" >&2
         exit 1
     fi
-    echo "OK:   no duplicate tags"
+    echo "OK:   repository URL: $_repo"
 
     if _css=$(resolve_love_css); then
-        echo "OK:   love-css found at $_css"
+        echo "OK:   local love-css found at $_css"
         _missing=0
         for _m in $(registry_modules); do
             _file=$(module_css_file "$_m")
@@ -87,10 +86,10 @@ cmd_doctor() {
             fi
         done
         if [ "$_missing" -eq 0 ]; then
-            echo "OK:   all module files present in love-css"
+            echo "OK:   all module files present in local love-css"
         fi
     else
-        echo "WARN: love-css not found — module file check skipped"
+        echo "OK:   no local love-css — modules will be fetched from GitHub"
     fi
 
     echo ""
