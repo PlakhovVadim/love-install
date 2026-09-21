@@ -158,6 +158,7 @@ install_module_file() {
 }
 
 # Recursively install a module and its dependencies.
+# Stops on the first failure so a preset never installs partially.
 install_module_with_deps() {
     _module="$1"
     _css_dir="$2"
@@ -169,10 +170,10 @@ install_module_with_deps() {
     _visited="$_visited $_module"
 
     for _dep in $(module_deps "$_module"); do
-        install_module_with_deps "$_dep" "$_css_dir" "$_visited"
+        install_module_with_deps "$_dep" "$_css_dir" "$_visited" || return 1
     done
 
-    install_module_file "$_module" "$_css_dir"
+    install_module_file "$_module" "$_css_dir" || return 1
 }
 
 # Write or update love.json in the project root.
