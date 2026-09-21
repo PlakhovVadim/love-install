@@ -1,0 +1,9 @@
+{
+  "name": "docs",
+  "description": "Documentation: typography, code, sidebar navigation, no forms.",
+  "modules": ["reset", "tokens", "base", "layout", "utilities", "animations", "themes", "button", "card", "table", "alert", "badge", "tabs", "tooltip", "dropdown", "accordion", "pagination", "breadcrumbs", "skeleton", "spinner"],
+  "theme": "auto",
+  "density": "comfortable",
+  "rtl": false,
+  "htmx": true
+}

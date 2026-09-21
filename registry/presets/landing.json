@@ -1,0 +1,9 @@
+{
+  "name": "landing",
+  "description": "Landing page: cards, alerts, entrance animations, no tables.",
+  "modules": ["reset", "tokens", "base", "layout", "utilities", "animations", "themes", "button", "card", "alert", "toast", "dropdown", "avatar", "progress", "skeleton", "spinner", "modal"],
+  "theme": "auto",
+  "density": "comfortable",
+  "rtl": false,
+  "htmx": false
+}

@@ -1,0 +1,149 @@
+#!/bin/sh
+# Love.css CLI — POSIX-compatible entrypoint.
+# This script parses arguments and dispatches to lib/cmd_*.sh.
+# It must work on Linux, macOS, and Git Bash for Windows.
+
+set -eu
+
+# Resolve the absolute path of this script, following symlinks.
+# This is required because the installer creates a symlink in PATH.
+resolve_script_dir() {
+    _target="$1"
+    while [ -L "$_target" ]; do
+        _dir=$(dirname "$_target")
+        _target=$(readlink "$_target")
+        case "$_target" in
+            /*) ;;
+            *) _target="$_dir/$_target" ;;
+        esac
+    done
+    _dir=$(dirname "$_target")
+    (cd "$_dir" && pwd)
+}
+
+LOVE_ROOT=$(resolve_script_dir "$0")
+export LOVE_ROOT
+LIB_DIR="$LOVE_ROOT/lib"
+
+if [ ! -d "$LIB_DIR" ]; then
+    echo "love: installation is broken. Run install.sh again." >&2
+    exit 1
+fi
+
+# shellcheck source=lib/common.sh
+. "$LIB_DIR/common.sh"
+
+usage() {
+    cat <<'EOF'
+Love.css — minimal CSS framework for fast interface assembly.
+
+Usage:
+  love <command> [options]
+
+Commands:
+  install <preset>        Install a preset into the current project.
+  install custom          Create an empty love.json for manual assembly.
+  install love-css        Clone the full love-css repository.
+  add <module>            Add a module and its dependencies.
+  remove <module>         Remove a module.
+  list                    List all available modules and presets.
+  module list             List modules with + / - markers for the project.
+  info -m <module>        Show module information.
+  info -p <preset>        Show preset information.
+  status                  Show installed modules and active preset.
+  check                   Scan HTML files and report required modules.
+  doctor                  Validate registry integrity.
+  update                  Update installed modules to the latest version.
+  new <preset> <dir>      Create a new project from a template.
+  help                    Show this help.
+  version                 Show CLI version.
+
+Examples:
+  love install admin
+  love add button
+  love check
+  love info -m button
+EOF
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 0
+fi
+
+COMMAND="$1"
+shift
+
+case "$COMMAND" in
+    install)
+        # shellcheck source=lib/cmd_install.sh
+        . "$LIB_DIR/cmd_install.sh"
+        cmd_install "$@"
+        ;;
+    add)
+        # shellcheck source=lib/cmd_add.sh
+        . "$LIB_DIR/cmd_add.sh"
+        cmd_add "$@"
+        ;;
+    remove)
+        # shellcheck source=lib/cmd_remove.sh
+        . "$LIB_DIR/cmd_remove.sh"
+        cmd_remove "$@"
+        ;;
+    list)
+        # shellcheck source=lib/cmd_list.sh
+        . "$LIB_DIR/cmd_list.sh"
+        cmd_list "$@"
+        ;;
+    module)
+        # shellcheck source=lib/cmd_list.sh
+        . "$LIB_DIR/cmd_list.sh"
+        cmd_module_list "$@"
+        ;;
+    info)
+        # shellcheck source=lib/cmd_info.sh
+        . "$LIB_DIR/cmd_info.sh"
+        cmd_info "$@"
+        ;;
+    status)
+        # shellcheck source=lib/cmd_status.sh
+        . "$LIB_DIR/cmd_status.sh"
+        cmd_status "$@"
+        ;;
+    check)
+        # shellcheck source=lib/cmd_check.sh
+        . "$LIB_DIR/cmd_check.sh"
+        cmd_check "$@"
+        ;;
+    doctor)
+        # shellcheck source=lib/cmd_status.sh
+        . "$LIB_DIR/cmd_status.sh"
+        cmd_doctor "$@"
+        ;;
+    update)
+        # shellcheck source=lib/cmd_update.sh
+        . "$LIB_DIR/cmd_update.sh"
+        cmd_update "$@"
+        ;;
+    new)
+        # shellcheck source=lib/cmd_new.sh
+        . "$LIB_DIR/cmd_new.sh"
+        cmd_new "$@"
+        ;;
+    create)
+        # shellcheck source=lib/cmd_create.sh
+        . "$LIB_DIR/cmd_create.sh"
+        cmd_create "$@"
+        ;;
+    help|--help|-h)
+        usage
+        ;;
+    version|--version|-v)
+        echo "love 0.1.0"
+        ;;
+    *)
+        echo "love: unknown command '$COMMAND'" >&2
+        echo "Run 'love help' for usage." >&2
+        exit 1
+        ;;
+esac

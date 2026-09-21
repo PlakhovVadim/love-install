@@ -1,0 +1,9 @@
+{
+  "name": "custom",
+  "description": "Empty preset for manual assembly with love add.",
+  "modules": [],
+  "theme": "auto",
+  "density": "comfortable",
+  "rtl": false,
+  "htmx": false
+}
