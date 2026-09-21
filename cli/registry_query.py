@@ -14,6 +14,15 @@ def load(path):
         return json.load(fh)
 
 
+def cmd_repository(registry_path):
+    reg = load(registry_path)
+    repo = reg.get("repository", "")
+    if not repo:
+        print("love: registry has no repository URL", file=sys.stderr)
+        sys.exit(1)
+    print(repo)
+
+
 def cmd_modules(registry_path):
     reg = load(registry_path)
     for module in reg.get("modules", []):
@@ -93,22 +102,6 @@ def cmd_preset_info(preset_path):
     print(f"HTMX:          {data.get('htmx', False)}")
 
 
-def cmd_check_duplicate_tags(registry_path):
-    """Print duplicate tag assignments. Does not exit with an error.
-
-    The shell decides whether to fail based on whether output is empty.
-    """
-    reg = load(registry_path)
-    seen = {}
-    for module in reg.get("modules", []):
-        for tag in module.get("tags", []):
-            tag = tag.lower()
-            if tag in seen:
-                print(f"{tag}: {seen[tag]} and {module['name']}")
-            else:
-                seen[tag] = module["name"]
-
-
 def cmd_write_love_json(path, preset, modules, registry_path):
     reg = load(registry_path)
     elements = set()
@@ -155,6 +148,7 @@ def main():
     args = sys.argv[2:]
 
     dispatch = {
+        "repository": cmd_repository,
         "modules": cmd_modules,
         "module-file": cmd_module_file,
         "module-deps": cmd_module_deps,
@@ -163,7 +157,6 @@ def main():
         "preset-modules": cmd_preset_modules,
         "preset-meta": cmd_preset_meta,
         "preset-info": cmd_preset_info,
-        "check-duplicate-tags": cmd_check_duplicate_tags,
         "write-love-json": cmd_write_love_json,
         "love-json-field": cmd_love_json_field,
     }
