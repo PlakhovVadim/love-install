@@ -19,7 +19,8 @@ cmd_add() {
     _current=$(installed_modules | tr '\n' ' ')
     _preset=""
     if [ -f "$PWD/love.json" ]; then
-        _preset=$("$(require_python)" "$LOVE_ROOT/cli/registry_query.py" love-json-field "$PWD/love.json" preset-name 2>/dev/null || echo "")
+        _py=$(require_python)
+        _preset=$("$_py" "$LOVE_ROOT/cli/registry_query.py" love-json-field "$PWD/love.json" preset-name 2>/dev/null || echo "")
     fi
     write_love_json "$_preset" "$_current"
 
