@@ -43,7 +43,13 @@ _install_preset() {
     echo ""
 
     for _m in $(preset_modules "$_preset"); do
-        install_module_with_deps "$_m" "$_css_dir" ""
+        if ! install_module_with_deps "$_m" "$_css_dir" ""; then
+            echo "" >&2
+            echo "love: failed to install module '$_m'" >&2
+            echo "love: preset '$_preset' was not installed completely." >&2
+            echo "love: check that the version in registry matches love-css." >&2
+            exit 1
+        fi
         _modules="$_modules $_m"
     done
 
