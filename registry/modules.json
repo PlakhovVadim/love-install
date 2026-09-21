@@ -34,7 +34,7 @@
       "tags": ["h1", "h2", "h3", "h4", "h5", "h6", "p", "a", "abbr", "b", "bdi", "bdo", "cite", "code", "data", "dfn", "em", "i", "kbd", "mark", "q", "ruby", "rp", "rt", "s", "samp", "small", "strong", "sub", "sup", "time", "u", "var", "ul", "ol", "dl", "dt", "dd", "li", "blockquote", "pre", "img", "picture", "source", "video", "audio", "track", "canvas", "svg", "iframe", "embed", "object", "map", "area", "param"],
       "classes": [],
       "states": [":hover", ":focus", ":focus-visible", ":visited", ":active"],
-      "pseudos": ["::selection", "::placeholder"],
+      "pseudos": ["::selection"],
       "animations": ["transition"],
       "presets": ["custom", "admin", "landing", "docs", "auth"]
     },
@@ -44,7 +44,7 @@
       "deps": ["reset", "tokens"],
       "description": "Containers, grids, and alignment primitives.",
       "tags": ["div", "section", "article", "aside", "header", "footer", "nav", "hgroup", "address", "menu", "figure", "figcaption", "details", "summary"],
-      "classes": [".container", ".container-fluid", ".row", ".col", ".stack", ".cluster", ".center", ".sidebar", ".grid", ".grid-2", ".grid-3", ".grid-4", ".grid-auto"],
+      "classes": [".container", ".container-fluid", ".row", ".col", ".col-auto", ".col-1", ".col-2", ".col-3", ".col-4", ".col-6", ".col-8", ".col-12", ".stack", ".stack-0", ".stack-1", ".stack-2", ".stack-3", ".stack-4", ".stack-6", ".stack-8", ".cluster", ".cluster-between", ".center", ".sidebar", ".sidebar-right", ".grid", ".grid-auto", ".grid-2", ".grid-3", ".grid-4", ".full-bleed"],
       "states": [],
       "pseudos": [],
       "animations": [],
@@ -56,7 +56,7 @@
       "deps": ["reset", "tokens"],
       "description": "Spacing, alignment, and visibility utilities.",
       "tags": [],
-      "classes": [".p-0", ".p-1", ".p-2", ".p-3", ".p-4", ".m-0", ".m-1", ".m-2", ".m-3", ".m-4", ".text-left", ".text-center", ".text-right", ".text-muted", ".hide", ".sr-only", ".flex", ".w-full"],
+      "classes": [".p-0", ".p-1", ".p-2", ".p-3", ".p-4", ".p-5", ".p-6", ".p-8", ".px-0", ".px-1", ".px-2", ".px-3", ".px-4", ".px-6", ".py-0", ".py-1", ".py-2", ".py-3", ".py-4", ".py-6", ".m-0", ".m-1", ".m-2", ".m-3", ".m-4", ".m-6", ".m-8", ".m-auto", ".mt-0", ".mt-1", ".mt-2", ".mt-3", ".mt-4", ".mt-6", ".mt-8", ".mt-auto", ".mb-0", ".mb-1", ".mb-2", ".mb-3", ".mb-4", ".mb-6", ".mb-8", ".mb-auto", ".ml-0", ".ml-2", ".ml-4", ".ml-auto", ".mr-0", ".mr-2", ".mr-4", ".mr-auto", ".mx-auto", ".my-0", ".my-2", ".my-4", ".gap-0", ".gap-1", ".gap-2", ".gap-3", ".gap-4", ".gap-6", ".gap-8", ".text-left", ".text-center", ".text-right", ".text-justify", ".text-muted", ".text-inverse", ".text-primary", ".text-danger", ".text-success", ".text-warning", ".text-xs", ".text-sm", ".text-base", ".text-lg", ".text-xl", ".text-2xl", ".text-bold", ".text-semibold", ".text-medium", ".text-normal", ".text-light", ".text-uppercase", ".text-lowercase", ".text-capitalize", ".text-truncate", ".hide", ".show", ".invisible", ".visible", ".sr-only", ".flex", ".inline-flex", ".flex-col", ".flex-row", ".flex-wrap", ".flex-nowrap", ".flex-1", ".flex-auto", ".flex-none", ".items-start", ".items-center", ".items-end", ".items-stretch", ".justify-start", ".justify-center", ".justify-end", ".justify-between", ".justify-around", ".w-full", ".w-auto", ".h-full", ".h-auto"],
       "states": [],
       "pseudos": [],
       "animations": [],
@@ -68,10 +68,10 @@
       "deps": ["tokens"],
       "description": "Simple CSS animations for states and element appearance.",
       "tags": [],
-      "classes": [".fade-in", ".fade-out", ".slide-up", ".slide-down", ".scale-in", ".spin", ".shimmer", ".pulse"],
+      "classes": [".fade-in", ".fade-out", ".slide-up", ".slide-down", ".scale-in", ".scale-out", ".spin", ".shimmer", ".pulse", ".duration-fast", ".duration-normal", ".duration-slow", ".delay-100", ".delay-200", ".delay-300", ".delay-500"],
       "states": [],
       "pseudos": [],
-      "animations": ["fade-in", "fade-out", "slide-up", "slide-down", "scale-in", "spin", "shimmer", "pulse"],
+      "animations": ["love-fade-in", "love-fade-out", "love-slide-up", "love-slide-down", "love-scale-in", "love-scale-out", "love-spin", "love-shimmer", "love-pulse"],
       "presets": ["admin", "landing", "docs", "auth"]
     },
     {
@@ -92,20 +92,20 @@
       "deps": ["tokens", "base"],
       "description": "Buttons with variants, sizes, and states.",
       "tags": ["button"],
-      "classes": [".btn", ".btn-primary", ".btn-danger", ".btn-ghost", ".btn-sm", ".btn-lg", ".is-loading"],
-      "states": [":hover", ":focus-visible", ":active", ":disabled"],
-      "pseudos": [],
-      "animations": ["transition"],
+      "classes": [".btn", ".btn-primary", ".btn-secondary", ".btn-ghost", ".btn-danger", ".btn-success", ".btn-sm", ".btn-lg", ".btn-block", ".btn-icon", ".btn-group", ".is-loading", ".is-selected", ".is-disabled"],
+      "states": [":hover", ":focus-visible", ":active", ":disabled", "[aria-pressed=\"true\"]"],
+      "pseudos": ["::file-selector-button", "::-webkit-file-upload-button"],
+      "animations": ["love-btn-spin", "transition"],
       "presets": ["admin", "landing", "docs", "auth"]
     },
     {
       "name": "card",
       "file": "css/love.card.css",
       "deps": ["tokens", "base"],
-      "description": "Cards with header, body, and footer.",
+      "description": "Cards with header, body, footer, and variants.",
       "tags": [],
-      "classes": [".card", ".card-header", ".card-body", ".card-footer", ".card-flat"],
-      "states": [":hover"],
+      "classes": [".card", ".card-header", ".card-body", ".card-footer", ".card-title", ".card-subtitle", ".card-text", ".card-media", ".card-actions", ".card-actions-end", ".card-flat", ".card-bordered", ".card-hover", ".card-compact", ".card-accent", ".card-accent-danger", ".card-accent-success", ".card-accent-warning", ".card-interactive"],
+      "states": [":hover", ":focus-visible"],
       "pseudos": [],
       "animations": ["transition"],
       "presets": ["admin", "landing", "docs"]
@@ -114,11 +114,11 @@
       "name": "form",
       "file": "css/love.form.css",
       "deps": ["tokens", "base"],
-      "description": "Form fields, labels, validation, and hints.",
+      "description": "Form fields, labels, validation, hints, and input groups.",
       "tags": ["form", "fieldset", "legend", "label", "input", "select", "optgroup", "option", "textarea", "output", "progress", "meter", "datalist"],
-      "classes": [".form-group", ".form-label", ".form-input", ".form-error", ".form-hint", ".form-row", ".form-check"],
-      "states": [":focus", ":focus-visible", ":invalid", ":valid", ":disabled", ":placeholder-shown"],
-      "pseudos": ["::file-selector-button"],
+      "classes": [".form-group", ".form-label", ".form-label-required", ".form-input", ".form-input-sm", ".form-input-lg", ".form-hint", ".form-error", ".form-check", ".form-check-hint", ".form-row", ".form-row-2", ".form-row-3", ".input-group", ".input-group-text", ".is-error", ".is-success"],
+      "states": [":hover", ":focus", ":focus-visible", ":invalid", ":valid", ":disabled", ":placeholder-shown"],
+      "pseudos": ["::placeholder", "::file-selector-button"],
       "animations": ["transition"],
       "presets": ["admin", "landing", "docs", "auth"]
     },
@@ -126,9 +126,9 @@
       "name": "table",
       "file": "css/love.table.css",
       "deps": ["tokens", "base"],
-      "description": "Tables with stripes, hover, and compact mode.",
+      "description": "Tables with stripes, hover, borders, and compact mode.",
       "tags": ["table", "caption", "colgroup", "col", "thead", "tbody", "tfoot", "tr", "th", "td"],
-      "classes": [".table", ".table-striped", ".table-hover", ".table-compact", ".table-bordered"],
+      "classes": [".table", ".table-striped", ".table-hover", ".table-bordered", ".table-compact", ".table-sticky", ".table-responsive", ".is-selected", ".is-disabled"],
       "states": [":hover", ":nth-child(odd)", ":nth-child(even)"],
       "pseudos": [],
       "animations": ["transition"],
@@ -143,7 +143,7 @@
       "classes": [".modal", ".modal-backdrop", ".modal-header", ".modal-body", ".modal-footer"],
       "states": [":modal", "[open]"],
       "pseudos": ["::backdrop"],
-      "animations": ["fade-in", "slide-up", "scale-in"],
+      "animations": ["love-fade-in", "love-slide-up", "love-scale-in"],
       "presets": ["admin", "landing"]
     },
     {
@@ -155,7 +155,7 @@
       "classes": [".alert", ".alert-success", ".alert-danger", ".alert-warning", ".alert-info"],
       "states": [],
       "pseudos": [],
-      "animations": ["fade-in"],
+      "animations": ["love-fade-in"],
       "presets": ["admin", "landing", "docs", "auth"]
     },
     {
@@ -164,7 +164,7 @@
       "deps": ["tokens", "base"],
       "description": "Badges and labels.",
       "tags": [],
-      "classes": [".badge", ".badge-primary", ".badge-success", ".badge-danger"],
+      "classes": [".badge", ".badge-primary", ".badge-success", ".badge-danger", ".badge-warning"],
       "states": [],
       "pseudos": [],
       "animations": [],
@@ -191,7 +191,7 @@
       "classes": [".toast", ".toast-success", ".toast-danger"],
       "states": [],
       "pseudos": [],
-      "animations": ["slide-down", "fade-out"],
+      "animations": ["love-slide-down", "love-fade-out"],
       "presets": ["admin", "landing"]
     },
     {
@@ -203,7 +203,7 @@
       "classes": [".tooltip"],
       "states": [":hover", ":focus-visible"],
       "pseudos": ["::before", "::after"],
-      "animations": ["fade-in", "scale-in"],
+      "animations": ["love-fade-in", "love-scale-in"],
       "presets": ["admin", "docs"]
     },
     {
@@ -215,7 +215,7 @@
       "classes": [".dropdown", ".dropdown-menu", ".dropdown-item"],
       "states": [":hover", ":focus", "[aria-expanded=\"true\"]"],
       "pseudos": [],
-      "animations": ["fade-in", "slide-down"],
+      "animations": ["love-fade-in", "love-slide-down"],
       "presets": ["admin", "landing", "docs"]
     },
     {
@@ -287,7 +287,7 @@
       "classes": [".skeleton"],
       "states": [],
       "pseudos": [],
-      "animations": ["shimmer", "pulse"],
+      "animations": ["love-shimmer", "love-pulse"],
       "presets": ["admin", "landing", "docs"]
     },
     {
@@ -299,7 +299,7 @@
       "classes": [".spinner"],
       "states": [],
       "pseudos": [],
-      "animations": ["spin"],
+      "animations": ["love-spin"],
       "presets": ["admin", "landing", "docs", "auth"]
     },
     {
@@ -323,7 +323,7 @@
       "classes": [".empty-state"],
       "states": [],
       "pseudos": [],
-      "animations": ["fade-in"],
+      "animations": ["love-fade-in"],
       "presets": ["admin", "docs"]
     },
     {
