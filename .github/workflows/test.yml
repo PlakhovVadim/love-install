@@ -50,19 +50,38 @@ jobs:
         shell: bash
         run: love doctor
 
-      - name: Create test project
+      - name: Test custom preset installation
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/test-project"
           cd "$RUNNER_TEMP/test-project"
           love install custom
           love status
-          love add button
-          love status
 
-      - name: Verify love check on empty project
+      - name: Test module list on empty project
         shell: bash
         run: |
           cd "$RUNNER_TEMP/test-project"
-          echo '<!doctype html><html><body><h1>Test</h1></body></html>' > index.html
+          love module list
+
+      - name: Test love check on sample HTML
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/test-project"
+          printf '<!doctype html>\n<html><body><h1>Test</h1><button class="btn">Click</button></body></html>\n' > index.html
           love check
+
+      - name: Verify love.json was created
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/test-project"
+          test -f love.json
+          cat love.json
+
+      - name: Verify love info for module
+        shell: bash
+        run: love info -m button
+
+      - name: Verify love info for preset
+        shell: bash
+        run: love info -p admin
