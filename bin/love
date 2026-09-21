@@ -5,10 +5,16 @@
 
 set -eu
 
-# Resolve the absolute path of this script, following symlinks.
-# This is required because the installer creates a symlink in PATH.
+# Resolve the absolute path of the directory containing this script.
+# Follows symlinks so that the CLI works when invoked via a PATH symlink.
 resolve_script_dir() {
     _target="$1"
+    # If the target is a bare command name, resolve it via PATH first.
+    case "$_target" in
+        */*) ;;
+        *) _target=$(command -v "$_target" 2>/dev/null || printf '%s' "$_target") ;;
+    esac
+    # Follow symlink chain until a regular file is reached.
     while [ -L "$_target" ]; do
         _dir=$(dirname "$_target")
         _target=$(readlink "$_target")
@@ -21,12 +27,17 @@ resolve_script_dir() {
     (cd "$_dir" && pwd)
 }
 
-LOVE_ROOT=$(resolve_script_dir "$0")
+# The script lives at <repo>/bin/love, so the repository root is the parent
+# of the bin directory.
+BIN_DIR=$(resolve_script_dir "$0")
+LOVE_ROOT=$(dirname "$BIN_DIR")
 export LOVE_ROOT
+
 LIB_DIR="$LOVE_ROOT/lib"
 
 if [ ! -d "$LIB_DIR" ]; then
-    echo "love: installation is broken. Run install.sh again." >&2
+    echo "love: installation is broken. Expected lib directory at $LIB_DIR" >&2
+    echo "love: run install.sh again from the repository root." >&2
     exit 1
 fi
 
