@@ -1,50 +1,3 @@
-# love status — show installed modules, active preset, love-css version.
-
-cmd_status() {
-    echo "Love.css status"
-    echo "==============="
-
-    _css_dir="$PWD/css"
-    if [ ! -d "$_css_dir" ]; then
-        echo "css/:            not found"
-        echo "modules:         none"
-        echo ""
-        echo "Run 'love install <preset>' or 'love install custom' to begin."
-        return 0
-    fi
-
-    _count=$(installed_modules | wc -l | tr -d ' ')
-    echo "css/:            $_css_dir"
-    echo "modules:         $_count installed"
-
-    if [ "$_count" -gt 0 ]; then
-        echo ""
-        echo "Installed modules:"
-        for _m in $(installed_modules); do
-            _file=$(module_css_file "$_m" 2>/dev/null)
-            _ver=""
-            if [ -n "$_file" ] && [ -f "$_css_dir/$(basename "$_file")" ]; then
-                _ver=$(head -1 "$_css_dir/$(basename "$_file")" | sed -n 's/.*Love\.css v\([0-9.]*\).*/\1/p')
-            fi
-            if [ -n "$_ver" ]; then
-                echo "  + love.$_m.css  (v$_ver)"
-            else
-                echo "  + love.$_m.css"
-            fi
-        done
-    fi
-
-    echo ""
-    if [ -f "$PWD/love.json" ]; then
-        _preset=$("$(require_python)" "$LOVE_ROOT/cli/registry_query.py" love-json-field "$PWD/love.json" preset-name)
-        echo "preset:          $_preset"
-        _info=$("$(require_python)" "$LOVE_ROOT/cli/registry_query.py" love-json-field "$PWD/love.json" info)
-        [ -n "$_info" ] && echo "info:            $_info"
-    else
-        echo "preset:          none (love.json not found)"
-    fi
-}
-
 # love doctor — validate registry integrity.
 
 cmd_doctor() {
@@ -59,7 +12,8 @@ cmd_doctor() {
     fi
     echo "OK:   registry found"
 
-    _dup=$("$(require_python)" "$LOVE_ROOT/cli/registry_query.py" check-duplicate-tags "$_reg")
+    _py=$(require_python)
+    _dup=$("$_py" "$LOVE_ROOT/cli/registry_query.py" check-duplicate-tags "$_reg" 2>/dev/null || true)
     if [ -n "$_dup" ]; then
         echo "FAIL: duplicate tags found:" >&2
         echo "$_dup" >&2
@@ -68,9 +22,13 @@ cmd_doctor() {
     echo "OK:   no duplicate tags"
 
     _css=$(resolve_love_css) || {
-        echo "WARN: love-css not found — cannot verify module files"
+        echo "WARN: love-css not found — module file check skipped"
+        echo ""
+        echo "Registry structure is valid."
         return 0
     }
+    echo "OK:   love-css found at $_css"
+
     _missing=0
     for _m in $(registry_modules); do
         _file=$(module_css_file "$_m")

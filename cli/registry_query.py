@@ -94,20 +94,19 @@ def cmd_preset_info(preset_path):
 
 
 def cmd_check_duplicate_tags(registry_path):
+    """Print duplicate tag assignments. Does not exit with an error.
+
+    The shell decides whether to fail based on whether output is empty.
+    """
     reg = load(registry_path)
     seen = {}
-    duplicates = []
     for module in reg.get("modules", []):
         for tag in module.get("tags", []):
             tag = tag.lower()
             if tag in seen:
-                duplicates.append(f"  {tag}: {seen[tag]} and {module['name']}")
+                print(f"{tag}: {seen[tag]} and {module['name']}")
             else:
                 seen[tag] = module["name"]
-    for line in duplicates:
-        print(line)
-    if duplicates:
-        sys.exit(1)
 
 
 def cmd_write_love_json(path, preset, modules, registry_path):
@@ -145,6 +144,9 @@ def cmd_love_json_field(path, field):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(newline="\n")
+
     if len(sys.argv) < 2:
         print("usage: registry_query.py <command> [args]", file=sys.stderr)
         sys.exit(1)
