@@ -1,6 +1,7 @@
 {
   "name": "love-css",
-  "version": "0.1.0",
+  "version": "v0.1.0",
+  "repository": "https://raw.githubusercontent.com/PlakhovVadim/love-css/v0.1.0",
   "modules": [
     {
       "name": "reset",
