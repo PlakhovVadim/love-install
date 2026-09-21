@@ -38,7 +38,6 @@ EOF
     echo "$_css_dir"
 }
 
-# Read the registry file and print its path.
 registry_file() {
     echo "$LOVE_ROOT/registry/modules.json"
 }
@@ -61,28 +60,32 @@ require_python() {
 
 # Print a list of module names from the registry.
 registry_modules() {
-    require_python >/dev/null
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" modules "$(registry_file)"
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" modules "$(registry_file)"
 }
 
 # Print the CSS file path for a module, relative to love-css.
 module_css_file() {
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" module-file "$(registry_file)" "$1"
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" module-file "$(registry_file)" "$1"
 }
 
 # Print the dependency list for a module, one per line.
 module_deps() {
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" module-deps "$(registry_file)" "$1"
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" module-deps "$(registry_file)" "$1"
 }
 
 # Print preset module list, one per line.
 preset_modules() {
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" preset-modules "$(preset_file "$1")"
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-modules "$(preset_file "$1")"
 }
 
 # Print preset metadata field.
 preset_meta() {
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" preset-meta "$(preset_file "$1")" "$2"
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-meta "$(preset_file "$1")" "$2"
 }
 
 # Resolve the project CSS directory. Creates it if missing.
@@ -154,7 +157,7 @@ install_module_with_deps() {
 write_love_json() {
     _preset="$1"
     _modules="$2"
-    require_python >/dev/null
-    "$(require_python)" "$LOVE_ROOT/cli/registry_query.py" write-love-json \
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" write-love-json \
         "$PWD/love.json" "$_preset" "$_modules" "$(registry_file)"
 }

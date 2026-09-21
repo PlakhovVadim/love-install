@@ -9,12 +9,10 @@ set -eu
 # Follows symlinks so that the CLI works when invoked via a PATH symlink.
 resolve_script_dir() {
     _target="$1"
-    # If the target is a bare command name, resolve it via PATH first.
     case "$_target" in
         */*) ;;
         *) _target=$(command -v "$_target" 2>/dev/null || printf '%s' "$_target") ;;
     esac
-    # Follow symlink chain until a regular file is reached.
     while [ -L "$_target" ]; do
         _dir=$(dirname "$_target")
         _target=$(readlink "$_target")
@@ -43,6 +41,24 @@ fi
 
 # shellcheck source=lib/common.sh
 . "$LIB_DIR/common.sh"
+
+# Load a lib file and invoke a function defined in it.
+# Fails loudly if the file is missing or the function is not defined.
+dispatch() {
+    _lib="$1"; shift
+    _fn="$1"; shift
+    if [ ! -f "$LIB_DIR/$_lib" ]; then
+        echo "love: internal error: missing $LIB_DIR/$_lib" >&2
+        exit 1
+    fi
+    # shellcheck disable=SC1090
+    . "$LIB_DIR/$_lib"
+    if ! command -v "$_fn" >/dev/null 2>&1; then
+        echo "love: internal error: function '$_fn' not defined in $_lib" >&2
+        exit 1
+    fi
+    "$_fn" "$@"
+}
 
 usage() {
     cat <<'EOF'
@@ -86,66 +102,18 @@ COMMAND="$1"
 shift
 
 case "$COMMAND" in
-    install)
-        # shellcheck source=lib/cmd_install.sh
-        . "$LIB_DIR/cmd_install.sh"
-        cmd_install "$@"
-        ;;
-    add)
-        # shellcheck source=lib/cmd_add.sh
-        . "$LIB_DIR/cmd_add.sh"
-        cmd_add "$@"
-        ;;
-    remove)
-        # shellcheck source=lib/cmd_remove.sh
-        . "$LIB_DIR/cmd_remove.sh"
-        cmd_remove "$@"
-        ;;
-    list)
-        # shellcheck source=lib/cmd_list.sh
-        . "$LIB_DIR/cmd_list.sh"
-        cmd_list "$@"
-        ;;
-    module)
-        # shellcheck source=lib/cmd_list.sh
-        . "$LIB_DIR/cmd_list.sh"
-        cmd_module_list "$@"
-        ;;
-    info)
-        # shellcheck source=lib/cmd_info.sh
-        . "$LIB_DIR/cmd_info.sh"
-        cmd_info "$@"
-        ;;
-    status)
-        # shellcheck source=lib/cmd_status.sh
-        . "$LIB_DIR/cmd_status.sh"
-        cmd_status "$@"
-        ;;
-    check)
-        # shellcheck source=lib/cmd_check.sh
-        . "$LIB_DIR/cmd_check.sh"
-        cmd_check "$@"
-        ;;
-    doctor)
-        # shellcheck source=lib/cmd_status.sh
-        . "$LIB_DIR/cmd_status.sh"
-        cmd_doctor "$@"
-        ;;
-    update)
-        # shellcheck source=lib/cmd_update.sh
-        . "$LIB_DIR/cmd_update.sh"
-        cmd_update "$@"
-        ;;
-    new)
-        # shellcheck source=lib/cmd_new.sh
-        . "$LIB_DIR/cmd_new.sh"
-        cmd_new "$@"
-        ;;
-    create)
-        # shellcheck source=lib/cmd_create.sh
-        . "$LIB_DIR/cmd_create.sh"
-        cmd_create "$@"
-        ;;
+    install)   dispatch cmd_install.sh  cmd_install  "$@" ;;
+    add)       dispatch cmd_add.sh      cmd_add      "$@" ;;
+    remove)    dispatch cmd_remove.sh   cmd_remove   "$@" ;;
+    list)      dispatch cmd_list.sh     cmd_list     "$@" ;;
+    module)    dispatch cmd_list.sh     cmd_module_list "$@" ;;
+    info)      dispatch cmd_info.sh     cmd_info     "$@" ;;
+    status)    dispatch cmd_status.sh   cmd_status   "$@" ;;
+    check)     dispatch cmd_check.sh    cmd_check    "$@" ;;
+    doctor)    dispatch cmd_status.sh   cmd_doctor   "$@" ;;
+    update)    dispatch cmd_update.sh   cmd_update   "$@" ;;
+    new)       dispatch cmd_new.sh      cmd_new      "$@" ;;
+    create)    dispatch cmd_create.sh   cmd_create   "$@" ;;
     help|--help|-h)
         usage
         ;;
