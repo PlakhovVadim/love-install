@@ -87,13 +87,37 @@
       "presets": ["admin", "landing", "docs", "auth"]
     },
     {
+      "name": "button",
+      "file": "css/love.button.css",
+      "deps": ["tokens", "base"],
+      "description": "Buttons with variants, sizes, and states.",
+      "tags": ["button"],
+      "classes": [".btn", ".btn-primary", ".btn-danger", ".btn-ghost", ".btn-sm", ".btn-lg", ".is-loading"],
+      "states": [":hover", ":focus-visible", ":active", ":disabled"],
+      "pseudos": [],
+      "animations": ["transition"],
+      "presets": ["admin", "landing", "docs", "auth"]
+    },
+    {
+      "name": "card",
+      "file": "css/love.card.css",
+      "deps": ["tokens", "base"],
+      "description": "Cards with header, body, and footer.",
+      "tags": [],
+      "classes": [".card", ".card-header", ".card-body", ".card-footer", ".card-flat"],
+      "states": [":hover"],
+      "pseudos": [],
+      "animations": ["transition"],
+      "presets": ["admin", "landing", "docs"]
+    },
+    {
       "name": "form",
       "file": "css/love.form.css",
       "deps": ["tokens", "base"],
       "description": "Form fields, labels, validation, and hints.",
-      "tags": ["form", "fieldset", "legend", "label", "input", "button", "select", "optgroup", "option", "textarea", "output", "progress", "meter", "datalist"],
-      "classes": [".form-group", ".form-label", ".form-input", ".form-error", ".form-hint", ".form-row", ".form-check", ".btn"],
-      "states": [":focus", ":focus-visible", ":invalid", ":valid", ":disabled", ":placeholder-shown", ":hover", ":active"],
+      "tags": ["form", "fieldset", "legend", "label", "input", "select", "optgroup", "option", "textarea", "output", "progress", "meter", "datalist"],
+      "classes": [".form-group", ".form-label", ".form-input", ".form-error", ".form-hint", ".form-row", ".form-check"],
+      "states": [":focus", ":focus-visible", ":invalid", ":valid", ":disabled", ":placeholder-shown"],
       "pseudos": ["::file-selector-button"],
       "animations": ["transition"],
       "presets": ["admin", "landing", "docs", "auth"]
@@ -121,18 +145,6 @@
       "pseudos": ["::backdrop"],
       "animations": ["fade-in", "slide-up", "scale-in"],
       "presets": ["admin", "landing"]
-    },
-    {
-      "name": "card",
-      "file": "css/love.card.css",
-      "deps": ["tokens", "base"],
-      "description": "Cards with header, body, and footer.",
-      "tags": [],
-      "classes": [".card", ".card-header", ".card-body", ".card-footer", ".card-flat"],
-      "states": [":hover"],
-      "pseudos": [],
-      "animations": ["transition"],
-      "presets": ["admin", "landing", "docs"]
     },
     {
       "name": "alert",
