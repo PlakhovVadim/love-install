@@ -1,0 +1,68 @@
+name: Cross-platform tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install love CLI (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          chmod +x install.sh bin/love
+          mkdir -p "$HOME/.local/bin"
+          ln -sf "$PWD/bin/love" "$HOME/.local/bin/love"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install love CLI (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $bin = Join-Path $PWD 'bin'
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+
+      - name: Verify love help
+        shell: bash
+        run: love help
+
+      - name: Verify love version
+        shell: bash
+        run: love version
+
+      - name: Verify love list
+        shell: bash
+        run: love list
+
+      - name: Verify love doctor
+        shell: bash
+        run: love doctor
+
+      - name: Create test project
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/test-project"
+          cd "$RUNNER_TEMP/test-project"
+          love install custom
+          love status
+          love add button
+          love status
+
+      - name: Verify love check on empty project
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/test-project"
+          echo '<!doctype html><html><body><h1>Test</h1></body></html>' > index.html
+          love check
