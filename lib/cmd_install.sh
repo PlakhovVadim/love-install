@@ -34,14 +34,22 @@ _install_preset() {
     _css_dir=$(project_css_dir)
     _modules=""
 
+    _source="remote"
+    if resolve_love_css >/dev/null 2>&1; then
+        _source="local"
+    fi
+
+    echo "love: installing preset '$_preset' ($_source source)"
+    echo ""
+
     for _m in $(preset_modules "$_preset"); do
         install_module_with_deps "$_m" "$_css_dir" ""
         _modules="$_modules $_m"
     done
 
     write_love_json "$_preset" "$_modules"
-    echo "love: preset '$_preset' installed"
-    echo "love: modules in $_css_dir"
+    echo ""
+    echo "love: preset '$_preset' installed into $_css_dir"
     echo "love: add <link rel=\"stylesheet\" href=\"css/love.*.css\"> to your HTML"
 }
 
@@ -54,13 +62,11 @@ _install_custom() {
 
 _clone_love_css() {
     shift
-    _dest="${1:-.}"
     _all=0
     for _arg in "$@"; do
         case "$_arg" in
             --all) _all=1 ;;
             -*) echo "love install love-css: unknown option $_arg" >&2; exit 1 ;;
-            *) _dest="$_arg" ;;
         esac
     done
 
@@ -69,13 +75,26 @@ _clone_love_css() {
         exit 1
     fi
 
-    _url="https://github.com/PlakhovVadim/love-css.git"
-    echo "love: cloning love-css into $_dest"
-    git clone --depth=1 "$_url" "$_dest"
+    _cache="${XDG_CACHE_HOME:-$HOME/.cache}/love-css"
+    mkdir -p "$(dirname "$_cache")"
+
+    if [ -d "$_cache/.git" ]; then
+        echo "love: updating local love-css in $_cache"
+        (cd "$_cache" && git pull --ff-only) || {
+            echo "love: failed to update $_cache" >&2
+            exit 1
+        }
+    else
+        echo "love: cloning love-css into $_cache"
+        git clone --depth=1 https://github.com/PlakhovVadim/love-css.git "$_cache"
+    fi
+
+    echo "love: love-css is available at $_cache"
+    echo "love: the CLI will use it automatically for future installs"
 
     if [ "$_all" -eq 1 ]; then
         _css_dir=$(project_css_dir)
-        for _f in "$_dest"/css/love.*.css; do
+        for _f in "$_cache"/css/love.*.css; do
             [ -f "$_f" ] || continue
             cp "$_f" "$_css_dir/"
         done
