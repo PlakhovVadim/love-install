@@ -1,8 +1,9 @@
 # Love.css CLI — shared utilities.
 # Sourced by bin/love and all lib/cmd_*.sh modules.
 
-# Resolve the love-css repository location.
+# Resolve the love-css repository location, if present.
 # Priority: LOVE_CSS_HOME env var, sibling directory, user cache.
+# Returns 1 if no local copy exists.
 resolve_love_css() {
     if [ -n "${LOVE_CSS_HOME:-}" ] && [ -d "$LOVE_CSS_HOME/css" ]; then
         echo "$LOVE_CSS_HOME"
@@ -19,23 +20,6 @@ resolve_love_css() {
         return 0
     fi
     return 1
-}
-
-# Fail with a clear message when love-css cannot be found.
-require_love_css() {
-    if ! _css_dir=$(resolve_love_css); then
-        cat >&2 <<'EOF'
-love: love-css repository not found.
-
-Provide it in one of these ways:
-  1. export LOVE_CSS_HOME=/path/to/love-css
-  2. Place love-css as a sibling of love-install
-  3. Run: love install love-css
-
-EOF
-        exit 1
-    fi
-    echo "$_css_dir"
 }
 
 registry_file() {
@@ -56,6 +40,23 @@ require_python() {
         echo "love: Python 3 is required. Install it and try again." >&2
         exit 1
     fi
+}
+
+# Check whether curl is available for remote module download.
+require_curl() {
+    if command -v curl >/dev/null 2>&1; then
+        echo "curl"
+        return 0
+    fi
+    echo "love: curl is required to download modules from GitHub." >&2
+    echo "love: install curl, or clone love-css locally and set LOVE_CSS_HOME." >&2
+    exit 1
+}
+
+# Print the base repository URL for module downloads.
+registry_repository() {
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" repository "$(registry_file)"
 }
 
 # Print a list of module names from the registry.
@@ -118,21 +119,42 @@ installed_modules() {
     done
 }
 
-# Copy a module CSS file from love-css into the project.
+# Copy or download one module CSS file into the project.
+# Uses a local love-css clone if available, otherwise fetches from GitHub.
 install_module_file() {
     _module="$1"
     _css_dir="$2"
-    _src=$(module_css_file "$_module") || {
+    _file=$(module_css_file "$_module") || {
         echo "love: unknown module '$_module'" >&2
         return 1
     }
-    _love_css=$(require_love_css)
-    _src_path="$_love_css/$_src"
-    if [ ! -f "$_src_path" ]; then
-        echo "love: source file not found: $_src_path" >&2
+    _base=$(basename "$_file")
+    _dest="$_css_dir/$_base"
+
+    if [ -f "$_dest" ]; then
+        return 0
+    fi
+
+    if _love_css=$(resolve_love_css); then
+        _src="$_love_css/$_file"
+        if [ ! -f "$_src" ]; then
+            echo "love: local file not found: $_src" >&2
+            return 1
+        fi
+        cp "$_src" "$_dest"
+        echo "  + $_base (local)"
+        return 0
+    fi
+
+    _curl=$(require_curl)
+    _repo=$(registry_repository)
+    _url="$_repo/$_file"
+    if ! "$_curl" -fsSL "$_url" -o "$_dest"; then
+        echo "love: failed to download $_url" >&2
+        rm -f "$_dest"
         return 1
     fi
-    cp "$_src_path" "$_css_dir/$(basename "$_src")"
+    echo "  + $_base (remote)"
 }
 
 # Recursively install a module and its dependencies.
