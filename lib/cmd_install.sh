@@ -47,7 +47,6 @@ _install_preset() {
             echo "" >&2
             echo "love: failed to install module '$_m'" >&2
             echo "love: preset '$_preset' was not installed completely." >&2
-            echo "love: check that the version in registry matches love-css." >&2
             exit 1
         fi
         _modules="$_modules $_m"
