@@ -39,10 +39,15 @@ _install_preset() {
         _source="local"
     fi
 
+    _list=$(preset_modules "$_preset")
+    _count=$(echo "$_list" | wc -l | tr -d ' ')
+
     echo "love: installing preset '$_preset' ($_source source)"
+    echo "love: preset contains $_count modules"
     echo ""
 
-    for _m in $(preset_modules "$_preset"); do
+    for _m in $_list; do
+        echo "love: > $_m"
         if ! install_module_with_deps "$_m" "$_css_dir" ""; then
             echo "" >&2
             echo "love: failed to install module '$_m'" >&2
