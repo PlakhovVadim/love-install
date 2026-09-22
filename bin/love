@@ -1,12 +1,8 @@
 #!/bin/sh
 # Love.css CLI — POSIX-compatible entrypoint.
-# This script parses arguments and dispatches to lib/cmd_*.sh.
-# It must work on Linux, macOS, and Git Bash for Windows.
 
-set -eu
+set -u
 
-# Resolve the absolute path of the directory containing this script.
-# Follows symlinks so that the CLI works when invoked via a PATH symlink.
 resolve_script_dir() {
     _target="$1"
     case "$_target" in
@@ -25,8 +21,6 @@ resolve_script_dir() {
     (cd "$_dir" && pwd)
 }
 
-# The script lives at <repo>/bin/love, so the repository root is the parent
-# of the bin directory.
 BIN_DIR=$(resolve_script_dir "$0")
 LOVE_ROOT=$(dirname "$BIN_DIR")
 export LOVE_ROOT
@@ -39,24 +33,24 @@ if [ ! -d "$LIB_DIR" ]; then
     exit 1
 fi
 
-# shellcheck source=lib/common.sh
 . "$LIB_DIR/common.sh"
 
-# Load a lib file and invoke a function defined in it.
-# Fails loudly if the file is missing or the function is not defined.
 dispatch() {
     _lib="$1"; shift
     _fn="$1"; shift
+
     if [ ! -f "$LIB_DIR/$_lib" ]; then
         echo "love: internal error: missing $LIB_DIR/$_lib" >&2
         exit 1
     fi
-    # shellcheck disable=SC1090
+
     . "$LIB_DIR/$_lib"
+
     if ! command -v "$_fn" >/dev/null 2>&1; then
         echo "love: internal error: function '$_fn' not defined in $_lib" >&2
         exit 1
     fi
+
     "$_fn" "$@"
 }
 
