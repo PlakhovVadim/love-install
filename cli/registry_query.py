@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Love.css registry query helper.
-
-Provides JSON queries used by the POSIX shell CLI. Kept separate from
-scan.py so that each script has a single responsibility.
-"""
+"""Love.css registry query helper."""
 
 import json
 import sys
@@ -33,7 +29,7 @@ def cmd_module_file(registry_path, name):
     reg = load(registry_path)
     for module in reg.get("modules", []):
         if module["name"] == name:
-            print(module["file"])
+            print(module.get("file", ""))
             return
     sys.exit(1)
 
