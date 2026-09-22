@@ -1,9 +1,5 @@
 # Love.css CLI — shared utilities.
-# Sourced by bin/love and all lib/cmd_*.sh modules.
 
-# Resolve the love-css repository location, if present.
-# Priority: LOVE_CSS_HOME env var, sibling directory, user cache.
-# Returns 1 if no local copy exists.
 resolve_love_css() {
     if [ -n "${LOVE_CSS_HOME:-}" ] && [ -d "$LOVE_CSS_HOME/css" ]; then
         echo "$LOVE_CSS_HOME"
@@ -30,7 +26,6 @@ preset_file() {
     echo "$LOVE_ROOT/registry/presets/$1.json"
 }
 
-# Check whether Python 3 is available for JSON parsing and HTML scanning.
 require_python() {
     if command -v python3 >/dev/null 2>&1; then
         echo "python3"
@@ -42,7 +37,6 @@ require_python() {
     fi
 }
 
-# Check whether curl is available for remote module download.
 require_curl() {
     if command -v curl >/dev/null 2>&1; then
         echo "curl"
@@ -53,56 +47,47 @@ require_curl() {
     exit 1
 }
 
-# Print the base repository URL for module downloads.
 registry_repository() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" repository "$(registry_file)"
 }
 
-# Print a list of module names from the registry.
 registry_modules() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" modules "$(registry_file)"
 }
 
-# Print the CSS file path for a module, relative to love-css.
 module_css_file() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" module-file "$(registry_file)" "$1"
 }
 
-# Print the dependency list for a module, one per line.
 module_deps() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" module-deps "$(registry_file)" "$1"
 }
 
-# Print preset module list, one per line.
 preset_modules() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-modules "$(preset_file "$1")"
 }
 
-# Print preset metadata field.
 preset_meta() {
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-meta "$(preset_file "$1")" "$2"
 }
 
-# Resolve the project CSS directory. Creates it if missing.
 project_css_dir() {
     _dir="$PWD/css"
     mkdir -p "$_dir"
     echo "$_dir"
 }
 
-# Check whether a module is already installed in the current project.
 module_installed() {
     _file=$(module_css_file "$1" 2>/dev/null) || return 1
     [ -n "$_file" ] && [ -f "$PWD/css/$(basename "$_file")" ]
 }
 
-# Print installed module names by scanning the project css directory.
 installed_modules() {
     if [ ! -d "$PWD/css" ]; then
         return 0
@@ -119,8 +104,6 @@ installed_modules() {
     done
 }
 
-# Copy or download one module CSS file into the project.
-# Uses a local love-css clone if available, otherwise fetches from GitHub.
 install_module_file() {
     _module="$1"
     _css_dir="$2"
@@ -128,6 +111,10 @@ install_module_file() {
         echo "love: unknown module '$_module'" >&2
         return 1
     }
+    if [ -z "$_file" ]; then
+        echo "love: registry has no file for module '$_module'" >&2
+        return 1
+    fi
     _base=$(basename "$_file")
     _dest="$_css_dir/$_base"
 
@@ -157,8 +144,6 @@ install_module_file() {
     echo "  + $_base (remote)"
 }
 
-# Recursively install a module and its dependencies.
-# Stops on the first failure so a preset never installs partially.
 install_module_with_deps() {
     _module="$1"
     _css_dir="$2"
@@ -167,16 +152,14 @@ install_module_with_deps() {
     case " $_visited " in
         *" $_module "*) return 0 ;;
     esac
-    _visited="$_visited $_module"
 
     for _dep in $(module_deps "$_module"); do
-        install_module_with_deps "$_dep" "$_css_dir" "$_visited" || return 1
+        install_module_with_deps "$_dep" "$_css_dir" "$_visited $_module" || return 1
     done
 
     install_module_file "$_module" "$_css_dir" || return 1
 }
 
-# Write or update love.json in the project root.
 write_love_json() {
     _preset="$1"
     _modules="$2"
