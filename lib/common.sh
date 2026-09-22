@@ -1,6 +1,7 @@
 # Love.css CLI — shared utilities.
 
 resolve_love_css() {
+    local _sibling _cache
     if [ -n "${LOVE_CSS_HOME:-}" ] && [ -d "$LOVE_CSS_HOME/css" ]; then
         echo "$LOVE_CSS_HOME"
         return 0
@@ -48,47 +49,56 @@ require_curl() {
 }
 
 registry_repository() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" repository "$(registry_file)"
 }
 
 registry_modules() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" modules "$(registry_file)"
 }
 
 module_css_file() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" module-file "$(registry_file)" "$1"
 }
 
 module_deps() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" module-deps "$(registry_file)" "$1"
 }
 
 preset_modules() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-modules "$(preset_file "$1")"
 }
 
 preset_meta() {
+    local _py
     _py=$(require_python)
     "$_py" "$LOVE_ROOT/cli/registry_query.py" preset-meta "$(preset_file "$1")" "$2"
 }
 
 project_css_dir() {
+    local _dir
     _dir="$PWD/css"
     mkdir -p "$_dir"
     echo "$_dir"
 }
 
 module_installed() {
+    local _file
     _file=$(module_css_file "$1" 2>/dev/null) || return 1
     [ -n "$_file" ] && [ -f "$PWD/css/$(basename "$_file")" ]
 }
 
 installed_modules() {
+    local f _base _name
     if [ ! -d "$PWD/css" ]; then
         return 0
     fi
@@ -105,6 +115,7 @@ installed_modules() {
 }
 
 install_module_file() {
+    local _module _css_dir _file _base _dest _love_css _src _curl _repo _url
     _module="$1"
     _css_dir="$2"
     _file=$(module_css_file "$_module") || {
@@ -145,6 +156,7 @@ install_module_file() {
 }
 
 install_module_with_deps() {
+    local _module _css_dir _visited _dep
     _module="$1"
     _css_dir="$2"
     _visited="$3"
@@ -161,6 +173,7 @@ install_module_with_deps() {
 }
 
 write_love_json() {
+    local _preset _modules _py
     _preset="$1"
     _modules="$2"
     _py=$(require_python)
