@@ -4,6 +4,35 @@
   "repository": "https://raw.githubusercontent.com/PlakhovVadim/love-css/v0.1.0",
   "modules": [
     {
+      "name": "fonts",
+      "file": "css/love.fonts.css",
+      "files": [
+        "assets/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf",
+        "assets/fonts/Space_Grotesk/OFL.txt",
+        "assets/fonts/Space_Grotesk/README.txt"
+      ],
+      "deps": ["tokens"],
+      "description": "Space Grotesk font files and @font-face rules.",
+      "tags": [],
+      "classes": [],
+      "states": [],
+      "pseudos": [],
+      "animations": [],
+      "presets": ["custom", "admin", "landing", "docs", "auth"]
+    },
+    {
+      "name": "overrides",
+      "file": "css/love.overrides.css",
+      "deps": [],
+      "description": "User overrides layer. Loaded last, wins without !important.",
+      "tags": [],
+      "classes": [],
+      "states": [],
+      "pseudos": [],
+      "animations": [],
+      "presets": ["custom", "admin", "landing", "docs", "auth"]
+    },
+    {
       "name": "reset",
       "file": "css/love.reset.css",
       "deps": [],
