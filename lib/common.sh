@@ -115,7 +115,8 @@ installed_modules() {
 }
 
 install_module_file() {
-    local _module _css_dir _file _base _dest _love_css _src _curl _repo _url
+    local _module _css_dir _file _base _dest _love_css _src
+    local _curl _repo _url _attempt _max_attempts
     _module="$1"
     _css_dir="$2"
     _file=$(module_css_file "$_module") || {
@@ -147,12 +148,24 @@ install_module_file() {
     _curl=$(require_curl)
     _repo=$(registry_repository)
     _url="$_repo/$_file"
-    if ! "$_curl" -fsSL "$_url" -o "$_dest"; then
-        echo "love: failed to download $_url" >&2
+    _max_attempts=3
+    _attempt=1
+
+    while [ "$_attempt" -le "$_max_attempts" ]; do
+        if "$_curl" -fsSL "$_url" -o "$_dest"; then
+            echo "  + $_base (remote)"
+            return 0
+        fi
         rm -f "$_dest"
-        return 1
-    fi
-    echo "  + $_base (remote)"
+        if [ "$_attempt" -lt "$_max_attempts" ]; then
+            echo "love: download attempt $_attempt of $_max_attempts failed for $_base, retrying in 2s" >&2
+            sleep 2
+        fi
+        _attempt=$((_attempt + 1))
+    done
+
+    echo "love: failed to download $_url after $_max_attempts attempts" >&2
+    return 1
 }
 
 install_module_with_deps() {
