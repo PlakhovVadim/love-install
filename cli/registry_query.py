@@ -34,6 +34,19 @@ def cmd_module_file(registry_path, name):
     sys.exit(1)
 
 
+def cmd_module_files(registry_path, name):
+    reg = load(registry_path)
+    for module in reg.get("modules", []):
+        if module["name"] == name:
+            if "files" in module:
+                for f in module["files"]:
+                    print(f)
+            else:
+                print(module.get("file", ""))
+            return
+    sys.exit(1)
+
+
 def cmd_module_deps(registry_path, name):
     reg = load(registry_path)
     for module in reg.get("modules", []):
@@ -147,6 +160,7 @@ def main():
         "repository": cmd_repository,
         "modules": cmd_modules,
         "module-file": cmd_module_file,
+        "module-files": cmd_module_files,
         "module-deps": cmd_module_deps,
         "module-desc": cmd_module_desc,
         "module-info": cmd_module_info,
