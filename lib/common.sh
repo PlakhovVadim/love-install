@@ -66,6 +66,12 @@ module_css_file() {
     "$_py" "$LOVE_ROOT/cli/registry_query.py" module-file "$(registry_file)" "$1"
 }
 
+module_files() {
+    local _py
+    _py=$(require_python)
+    "$_py" "$LOVE_ROOT/cli/registry_query.py" module-files "$(registry_file)" "$1"
+}
+
 module_deps() {
     local _py
     _py=$(require_python)
@@ -114,58 +120,98 @@ installed_modules() {
     done
 }
 
-install_module_file() {
+install_module_files() {
     local _module _css_dir _file _base _dest _love_css _src
     local _curl _repo _url _attempt _max_attempts
     _module="$1"
     _css_dir="$2"
-    _file=$(module_css_file "$_module") || {
+
+    # Get all files for this module
+    _files=$(module_files "$_module") || {
         echo "love: unknown module '$_module'" >&2
         return 1
     }
-    if [ -z "$_file" ]; then
-        echo "love: registry has no file for module '$_module'" >&2
+
+    if [ -z "$_files" ]; then
+        echo "love: registry has no files for module '$_module'" >&2
         return 1
-    fi
-    _base=$(basename "$_file")
-    _dest="$_css_dir/$_base"
-
-    if [ -f "$_dest" ]; then
-        return 0
-    fi
-
-    if _love_css=$(resolve_love_css); then
-        _src="$_love_css/$_file"
-        if [ ! -f "$_src" ]; then
-            echo "love: local file not found: $_src" >&2
-            return 1
-        fi
-        cp "$_src" "$_dest"
-        echo "  + $_base (local)"
-        return 0
     fi
 
     _curl=$(require_curl)
     _repo=$(registry_repository)
-    _url="$_repo/$_file"
-    _max_attempts=3
-    _attempt=1
 
-    while [ "$_attempt" -le "$_max_attempts" ]; do
-        if "$_curl" -fsSL "$_url" -o "$_dest"; then
-            echo "  + $_base (remote)"
-            return 0
+    # If local love-css is available, prefer it
+    if _love_css=$(resolve_love_css); then
+        for _file in $_files; do
+            _base=$(basename "$_file")
+            _dest="$_css_dir/$_base"
+            _src="$_love_css/$_file"
+
+            # For assets, preserve directory structure
+            case "$_file" in
+                assets/*)
+                    _dest="$PWD/$_file"
+                    mkdir -p "$(dirname "$_dest")"
+                    ;;
+                *)
+                    _dest="$_css_dir/$_base"
+                    ;;
+            esac
+
+            if [ -f "$_dest" ]; then
+                continue
+            fi
+
+            if [ ! -f "$_src" ]; then
+                echo "love: local file not found: $_src" >&2
+                return 1
+            fi
+            cp "$_src" "$_dest"
+            echo "  + $_file (local)"
+        done
+        return 0
+    fi
+
+    # Remote download
+    for _file in $_files; do
+        _base=$(basename "$_file")
+
+        case "$_file" in
+            assets/*)
+                _dest="$PWD/$_file"
+                mkdir -p "$(dirname "$_dest")"
+                ;;
+            *)
+                _dest="$_css_dir/$_base"
+                ;;
+        esac
+
+        if [ -f "$_dest" ]; then
+            continue
         fi
-        rm -f "$_dest"
-        if [ "$_attempt" -lt "$_max_attempts" ]; then
-            echo "love: download attempt $_attempt of $_max_attempts failed for $_base, retrying in 2s" >&2
-            sleep 2
+
+        _url="$_repo/$_file"
+        _max_attempts=3
+        _attempt=1
+
+        while [ "$_attempt" -le "$_max_attempts" ]; do
+            if "$_curl" -fsSL "$_url" -o "$_dest"; then
+                echo "  + $_file (remote)"
+                break
+            fi
+            rm -f "$_dest"
+            if [ "$_attempt" -lt "$_max_attempts" ]; then
+                echo "love: download attempt $_attempt of $_max_attempts failed for $_file, retrying in 2s" >&2
+                sleep 2
+            fi
+            _attempt=$((_attempt + 1))
+        done
+
+        if [ "$_attempt" -gt "$_max_attempts" ]; then
+            echo "love: failed to download $_url after $_max_attempts attempts" >&2
+            return 1
         fi
-        _attempt=$((_attempt + 1))
     done
-
-    echo "love: failed to download $_url after $_max_attempts attempts" >&2
-    return 1
 }
 
 install_module_with_deps() {
@@ -182,7 +228,7 @@ install_module_with_deps() {
         install_module_with_deps "$_dep" "$_css_dir" "$_visited $_module" || return 1
     done
 
-    install_module_file "$_module" "$_css_dir" || return 1
+    install_module_files "$_module" "$_css_dir" || return 1
 }
 
 write_love_json() {
