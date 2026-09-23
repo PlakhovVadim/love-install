@@ -1,7 +1,7 @@
 {
   "name": "admin",
   "description": "Admin panel: dense layout, tables, forms, modals, dark theme by default.",
-  "modules": ["reset", "tokens", "base", "layout", "utilities", "animations", "themes", "button", "card", "form", "table", "modal", "alert", "badge", "tabs", "toast", "tooltip", "dropdown", "accordion", "pagination", "breadcrumbs", "avatar", "progress", "skeleton", "spinner", "stat", "empty-state", "timeline"],
+  "modules": ["reset", "tokens", "base", "layout", "utilities", "animations", "themes", "button", "card", "form", "table", "modal", "alert", "badge", "tabs", "toast", "tooltip", "dropdown", "accordion", "pagination", "breadcrumbs", "avatar", "progress", "skeleton", "spinner", "stat", "empty-state", "timeline", "overrides"],
   "theme": "auto",
   "density": "compact",
   "rtl": false,
