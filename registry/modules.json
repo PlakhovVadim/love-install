@@ -7,11 +7,12 @@
       "name": "fonts",
       "file": "css/love.fonts.css",
       "files": [
+        "css/love.fonts.css",
         "assets/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf",
         "assets/fonts/Space_Grotesk/OFL.txt",
         "assets/fonts/Space_Grotesk/README.txt"
       ],
-      "deps": ["tokens"],
+      "deps": [],
       "description": "Space Grotesk font files and @font-face rules.",
       "tags": [],
       "classes": [],
@@ -47,7 +48,7 @@
     {
       "name": "tokens",
       "file": "css/love.tokens.css",
-      "deps": [],
+      "deps": ["fonts"],
       "description": "CSS custom properties: primitives, semantics, components.",
       "tags": [],
       "classes": [],
